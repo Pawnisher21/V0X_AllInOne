@@ -24,8 +24,31 @@ module.exports = {
 
         // --- Ticket System Logic ---
         if (interaction.isButton()) {
-            const { customId, guild, user } = interaction;
-            const categoryId = process.env.TICKET_CATEGORY_ID;
+            const { customId, guild, user, member } = interaction;
+            const categoryId = process.env.TICKET_CATEGORY_ID; // Ticket
+
+            // --- Button Role Logic ---
+            if (customId.startsWith('role_')) {
+                const roleId = customId.split('_')[1];
+                const role = guild.roles.cache.get(roleId);
+                
+                if (!role) {
+                    return interaction.reply({ content: 'Role ini sudah tidak ada/dihapus dari server.', ephemeral: true });
+                }
+
+                try {
+                    if (member.roles.cache.has(roleId)) {
+                        await member.roles.remove(roleId);
+                        return interaction.reply({ content: `Role **${role.name}** telah dihapus dari Anda.`, ephemeral: true });
+                    } else {
+                        await member.roles.add(roleId);
+                        return interaction.reply({ content: `Role **${role.name}** telah berhasil ditambahkan!`, ephemeral: true });
+                    }
+                } catch (error) {
+                    console.error(error);
+                    return interaction.reply({ content: 'Gagal mengatur role. Pastikan hirarki role bot ada di atas role yang ingin diberikan!', ephemeral: true });
+                }
+            }
 
             if (customId === 'open_ticket') {
                 const channelName = `ticket-${user.username.toLowerCase()}`;
