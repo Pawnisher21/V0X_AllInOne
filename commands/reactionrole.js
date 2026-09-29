@@ -33,16 +33,25 @@ module.exports = {
         const pesan = interaction.options.getString('pesan');
         const label = interaction.options.getString('label_tombol');
         const emoji = interaction.options.getString('emoji');
-        const color = interaction.options.getString('warna_embed') || 'Green';
-
-        if (role.position >= interaction.guild.members.me.roles.highest.position) {
-            return interaction.reply({ content: `Bot tidak bisa memberikan tipe Role ini karena posisi role **${role.name}** lebih tinggi dari role bot.`, ephemeral: true });
+        let finalColor = 'Green';
+        const inputColor = interaction.options.getString('warna_embed');
+        if (inputColor) {
+            if (inputColor.startsWith('#')) {
+                finalColor = inputColor;
+            } else {
+                finalColor = inputColor.charAt(0).toUpperCase() + inputColor.slice(1).toLowerCase();
+            }
         }
 
         const embed = new EmbedBuilder()
             .setTitle('✨ Dapatkan Role Anda!')
-            .setDescription(pesan)
-            .setColor(color);
+            .setDescription(pesan);
+            
+        try {
+            embed.setColor(finalColor);
+        } catch (e) {
+            embed.setColor('Green');
+        }
 
         const button = new ButtonBuilder()
             .setCustomId(`role_${role.id}`)
