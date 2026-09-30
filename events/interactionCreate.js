@@ -158,29 +158,41 @@ module.exports = {
 
             // --- Streamer Modal Logic ---
             if (interaction.customId === 'streamer_modal') {
-                const links = interaction.fields.getTextInputValue('streamer_links');
-                const roleId = '1554705939762905108'; // Role Streamer
+                const yt = interaction.fields.getTextInputValue('streamer_yt');
+                const kick = interaction.fields.getTextInputValue('streamer_kick');
+                const tiktok = interaction.fields.getTextInputValue('streamer_tiktok');
+                const twitch = interaction.fields.getTextInputValue('streamer_twitch');
+                const fb = interaction.fields.getTextInputValue('streamer_fb');
+                const roleId = '1554705939762905108'; // Role Streamer Whitelist
                 const member = interaction.member;
 
-                if (!links || links.trim().length === 0) {
-                    return interaction.reply({ content: 'Kamu wajib menyertakan minimal 1 link platform streaming!', ephemeral: true });
+                if (!yt && !kick && !tiktok && !twitch && !fb) {
+                    return interaction.reply({ content: 'Kamu wajib mengisi minimal 1 link platform streaming!', ephemeral: true });
                 }
+
+                const linksArray = [];
+                if (yt) linksArray.push(`**YouTube:** ${yt}`);
+                if (kick) linksArray.push(`**Kick:** ${kick}`);
+                if (tiktok) linksArray.push(`**TikTok:** ${tiktok}`);
+                if (twitch) linksArray.push(`**Twitch:** ${twitch}`);
+                if (fb) linksArray.push(`**Facebook:** ${fb}`);
+                const linksText = linksArray.join('\n');
 
                 try {
                     if (member.roles.cache.has(roleId)) {
-                        return interaction.reply({ content: 'Kamu sudah memiliki role Streamer!', ephemeral: true });
+                        return interaction.reply({ content: 'Kamu sudah terdaftar di whitelist Streamer!', ephemeral: true });
                     }
                     await member.roles.add(roleId);
 
                     const embed = new EmbedBuilder()
-                        .setTitle('Role Streamer Diberikan!')
-                        .setDescription(`Halo ${interaction.user}, kamu sekarang resmi menjadi Streamer! Bot akan otomatis mendeteksi saat kamu live dan memberi tahu member di channel notifikasi. Pastikan akun Discord kamu sudah tertaut (terhubung) dengan Twitch/YouTube kamu agar bot bida mendeteksi status live.\n\n**Link Kamu:**\n${links}`)
+                        .setTitle('Akses Streamer Diberikan!')
+                        .setDescription(`Halo ${interaction.user}, kamu sekarang resmi masuk *whitelist* Streamer! Saat kamu nge-Live dengan aplikasi tertaut Discord, bot akan otomatis memberi tahu server.\n\n**Platform Terdaftar:**\n${linksText}`)
                         .setColor('Green');
                     
                     await interaction.reply({ embeds: [embed], ephemeral: true });
                 } catch (error) {
                     console.error('Error giving streamer role:', error);
-                    await interaction.reply({ content: 'Terjadi kesalahan saat memberikan role streamer. Pastikan role bot berada lebih atas dari role streamer.', ephemeral: true });
+                    await interaction.reply({ content: 'Terjadi kesalahan saat memberikan role streamer.', ephemeral: true });
                 }
             }
             return;
@@ -233,17 +245,50 @@ module.exports = {
             if (interaction.customId === 'req_streamer') {
                 const modal = new ModalBuilder()
                     .setCustomId('streamer_modal')
-                    .setTitle('Request Role Streamer');
+                    .setTitle('Request Akses Streamer');
                 
-                const linkInput = new TextInputBuilder()
-                    .setCustomId('streamer_links')
-                    .setLabel('Link Channel (YouTube/Kick/TikTok dll)')
-                    .setPlaceholder('https://youtube.com/... atau tiktok.com/...')
-                    .setStyle(TextInputStyle.Paragraph)
-                    .setRequired(true);
+                const ytInput = new TextInputBuilder()
+                    .setCustomId('streamer_yt')
+                    .setLabel('Link YouTube')
+                    .setPlaceholder('https://youtube.com/...')
+                    .setStyle(TextInputStyle.Short)
+                    .setRequired(false);
+                    
+                const kickInput = new TextInputBuilder()
+                    .setCustomId('streamer_kick')
+                    .setLabel('Link Kick')
+                    .setPlaceholder('https://kick.com/...')
+                    .setStyle(TextInputStyle.Short)
+                    .setRequired(false);
+                    
+                const tiktokInput = new TextInputBuilder()
+                    .setCustomId('streamer_tiktok')
+                    .setLabel('Link TikTok')
+                    .setPlaceholder('https://tiktok.com/...')
+                    .setStyle(TextInputStyle.Short)
+                    .setRequired(false);
+                    
+                const twitchInput = new TextInputBuilder()
+                    .setCustomId('streamer_twitch')
+                    .setLabel('Link Twitch')
+                    .setPlaceholder('https://twitch.tv/...')
+                    .setStyle(TextInputStyle.Short)
+                    .setRequired(false);
+                    
+                const fbInput = new TextInputBuilder()
+                    .setCustomId('streamer_fb')
+                    .setLabel('Link Facebook Gaming')
+                    .setPlaceholder('https://facebook.com/...')
+                    .setStyle(TextInputStyle.Short)
+                    .setRequired(false);
                 
-                const actionRow = new ActionRowBuilder().addComponents(linkInput);
-                modal.addComponents(actionRow);
+                modal.addComponents(
+                    new ActionRowBuilder().addComponents(ytInput),
+                    new ActionRowBuilder().addComponents(kickInput),
+                    new ActionRowBuilder().addComponents(tiktokInput),
+                    new ActionRowBuilder().addComponents(twitchInput),
+                    new ActionRowBuilder().addComponents(fbInput)
+                );
                 
                 await interaction.showModal(modal);
             }
