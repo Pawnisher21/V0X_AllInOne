@@ -65,8 +65,9 @@ module.exports = {
                     ];
 
                     for (const roleId of allowedRoles) {
+                        if (!roleId) continue;
                         permissionOverwrites.push({
-                            id: roleId,
+                            id: roleId.toString(),
                             allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory],
                         });
                     }
