@@ -26,6 +26,19 @@
         "DYNAMIC_LIVE_ROLE_ID": "",
         "NOTIFICATION_CHANNEL_ID": ""
     },
+    "792353774785396737": {
+        "WELCOME_CHANNEL_ID": "",
+        "AUTO_ROLE_ID": "",
+        "UPDATE_CHANNEL_ID": "",
+        "TICKET_CATEGORY": "",
+        "TICKET_ALLOWED_ROLES": [
+            ""
+        ],
+        "STREAMER_ROLE_ID": "",
+        "TRANSCRIPT_CHANNEL_ID": "",
+        "DYNAMIC_LIVE_ROLE_ID": "",
+        "NOTIFICATION_CHANNEL_ID": ""
+    },
     "1010070853322539008": {
         "WELCOME_CHANNEL_ID": "1010071886123761725",
         "AUTO_ROLE_ID": "",
