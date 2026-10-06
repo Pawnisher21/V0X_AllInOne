@@ -1,10 +1,17 @@
 const { Events, EmbedBuilder } = require('discord.js');
 
+const fs = require('fs');
+const path = require('path');
+
 module.exports = {
     name: Events.GuildMemberAdd,
     async execute(member) {
-        const welcomeChannelId = process.env.WELCOME_CHANNEL_ID;
-        const autoRoleId = process.env.AUTO_ROLE_ID;
+        const configPath = path.join(__dirname, '..', 'config.json');
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        const guildConfig = config[member.guild.id] || {};
+
+        const welcomeChannelId = guildConfig.WELCOME_CHANNEL_ID;
+        const autoRoleId = guildConfig.AUTO_ROLE_ID;
 
         // Auto Role
         if (autoRoleId) {

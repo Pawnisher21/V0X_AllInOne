@@ -16,10 +16,15 @@ module.exports = {
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
             return interaction.reply({ content: 'Kamu tidak memiliki izin untuk menggunakan command ini!', ephemeral: true });
         }
-
-        const updateChannelId = process.env.UPDATE_CHANNEL_ID;
+        const fs = require('fs');
+        const path = require('path');
+        const configPath = path.join(__dirname, '..', 'config.json');
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        const guildConfig = config[interaction.guild.id] || {};
+        
+        const updateChannelId = guildConfig.UPDATE_CHANNEL_ID;
         if (!updateChannelId) {
-            return interaction.reply({ content: 'Channel pembaruan (UPDATE_CHANNEL_ID) tidak diatur dalam sistem!', ephemeral: true });
+            return interaction.reply({ content: 'Channel pembaruan tidak diatur untuk server ini di config.json!', ephemeral: true });
         }
 
         const channel = interaction.guild.channels.cache.get(updateChannelId);

@@ -3,6 +3,12 @@ const { Events, ChannelType, PermissionsBitField, ActionRowBuilder, ButtonBuilde
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
+        const fs = require('fs');
+        const path = require('path');
+        const configPath = path.join(__dirname, '..', 'config.json');
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        const guildConfig = interaction.guild ? (config[interaction.guild.id] || {}) : {};
+
         if (interaction.isChatInputCommand()) {
             const command = client.commands.get(interaction.commandName);
             if (!command) {
@@ -36,8 +42,12 @@ module.exports = {
                 }
 
                 try {
-                    const ticketCategory = '1554548485217591307';
-                    const allowedRoles = ['1554540431033761903', '1554540535455420456', '1554540633081905152', '1554540709963501699'];
+                    const ticketCategory = guildConfig.TICKET_CATEGORY;
+                    const allowedRoles = guildConfig.TICKET_ALLOWED_ROLES || [];
+                    
+                    if (!ticketCategory) {
+                        return interaction.reply({ content: 'Sistem Tiket belum dikonfigurasi untuk server ini!', ephemeral: true });
+                    }
                     
                     const permissionOverwrites = [
                         {
@@ -138,7 +148,7 @@ module.exports = {
                 }
                 
                 try {
-                    const targetChannelId = '1554542241958203423';
+                    const targetChannelId = guildConfig.UPDATE_CHANNEL_ID;
                     const targetChannel = interaction.guild.channels.cache.get(targetChannelId);
                     if (!targetChannel) {
                         return interaction.reply({ content: 'Gagal menemukan channel target Announcement.', ephemeral: true });
@@ -163,8 +173,12 @@ module.exports = {
                 const tiktok = interaction.fields.getTextInputValue('streamer_tiktok');
                 const twitch = interaction.fields.getTextInputValue('streamer_twitch');
                 const fb = interaction.fields.getTextInputValue('streamer_fb');
-                const roleId = '1554705939762905108'; // Role Streamer Whitelist
+                const roleId = guildConfig.STREAMER_ROLE_ID; // Role Streamer Whitelist
                 const member = interaction.member;
+
+                if (!roleId) {
+                    return interaction.reply({ content: 'Role Streamer belum dikonfigurasi untuk server ini!', ephemeral: true });
+                }
 
                 if (!yt && !kick && !tiktok && !twitch && !fb) {
                     return interaction.reply({ content: 'Kamu wajib mengisi minimal 1 link platform streaming!', ephemeral: true });
@@ -307,8 +321,8 @@ module.exports = {
                         return `[${date}] ${m.author.tag}: ${m.content || '[Embed/Attachment/System Message]'}`;
                     }).join('\n');
                     
-                    const transcriptChannelId = '1554548639861444668';
-                    const logChannel = guild.channels.cache.get(transcriptChannelId);
+                    const transcriptChannelId = guildConfig.TRANSCRIPT_CHANNEL_ID;
+                    const logChannel = transcriptChannelId ? guild.channels.cache.get(transcriptChannelId) : null;
                     
                     if (logChannel) {
                         const buffer = Buffer.from(transcriptData, 'utf-8');

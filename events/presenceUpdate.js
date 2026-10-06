@@ -6,16 +6,22 @@ module.exports = {
         // Harus ada object presence dan membernya
         if (!newPresence || !newPresence.member) return;
 
+        const fs = require('fs');
+        const path = require('path');
+        const configPath = path.join(__dirname, '..', 'config.json');
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        const guildConfig = config[newPresence.guild.id] || {};
+
         // Base Role untuk izin sistem notifikasi Streamer
-        const baseStreamerRoleId = '1554705939762905108';
-        if (!newPresence.member.roles.cache.has(baseStreamerRoleId)) return;
+        const baseStreamerRoleId = guildConfig.STREAMER_ROLE_ID;
+        if (!baseStreamerRoleId || !newPresence.member.roles.cache.has(baseStreamerRoleId)) return;
 
         // Cek activity streaming
         const wasStreaming = oldPresence ? oldPresence.activities.some(activity => activity.type === ActivityType.Streaming) : false;
         const isStreaming = newPresence.activities.some(activity => activity.type === ActivityType.Streaming);
 
         // Role The Showman (Diberikan dinamis HANYA saat live)
-        const dynamicLiveRoleId = '1554710857269641257';
+        const dynamicLiveRoleId = guildConfig.DYNAMIC_LIVE_ROLE_ID;
 
         // Jika baru mulai live stream
         if (!wasStreaming && isStreaming) {
@@ -31,8 +37,8 @@ module.exports = {
 
             const streamActivity = newPresence.activities.find(activity => activity.type === ActivityType.Streaming);
             
-            const notificationChannelId = '1554707598173933639';
-            const channel = newPresence.guild.channels.cache.get(notificationChannelId);
+            const notificationChannelId = guildConfig.NOTIFICATION_CHANNEL_ID;
+            const channel = notificationChannelId ? newPresence.guild.channels.cache.get(notificationChannelId) : null;
             
             if (channel) {
                 const embed = new EmbedBuilder()
