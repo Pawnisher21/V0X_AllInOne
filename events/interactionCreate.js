@@ -325,7 +325,7 @@ module.exports = {
                     const transcriptChannelId = guildConfig.TRANSCRIPT_CHANNEL_ID;
                     const logChannel = transcriptChannelId ? guild.channels.cache.get(transcriptChannelId) : null;
                     
-                    if (logChannel) {
+                    if (logChannel?.isTextBased()) {
                         const buffer = Buffer.from(transcriptData, 'utf-8');
                         const attachment = new AttachmentBuilder(buffer, { name: `${interaction.channel.name}-transcript.txt` });
                         
