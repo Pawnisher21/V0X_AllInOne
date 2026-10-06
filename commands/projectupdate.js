@@ -38,7 +38,8 @@ module.exports = {
                 .setRequired(false)),
                 
     async execute(interaction) {
-        if (interaction.guild.id !== '709279383340318740') {
+        const allowedGuilds = ['709279383340318740', '792353774785396737'];
+        if (!allowedGuilds.includes(interaction.guild.id)) {
             return interaction.reply({ content: 'Command ini khusus untuk server tertentu.', ephemeral: true });
         }
 
